@@ -110,6 +110,7 @@ public class Configuration {
             return key;
         }
 
+        @SuppressWarnings("unchecked")
         public <T> T getValue() {
             try {
                 return (T) value;
