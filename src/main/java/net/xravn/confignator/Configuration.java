@@ -2,6 +2,8 @@ package net.xravn.confignator;
 
 import java.util.HashMap;
 
+import net.xravn.confignator.exceptions.NodeNotFoundException;
+
 /**
  * class that provides a way to get and modify configuration values.
  */
@@ -26,8 +28,13 @@ public class Configuration {
         return (T) getNode(key).getValue();
     }
 
-    public void set(String key, Object value) {
-        getNode(key).setValue(value);
+    public void set(String key, Object value) throws NodeNotFoundException {
+        Node node = getNode(key);
+        if (node == null) {
+            throw new NodeNotFoundException(key, "Node not found");
+        } else {
+            node.setValue(value);
+        }
     }
 
     public void add(String key) {
@@ -116,8 +123,11 @@ public class Configuration {
         }
 
         public Node getNode(String key) {
+            String nodeKey = key;
             // get the first substring before the first dot
-            String nodeKey = key.substring(0, key.indexOf("."));
+            if (key.contains(".")) {
+                nodeKey = key.substring(0, key.indexOf("."));
+            }
             // search for the node
             Node node = children.get(nodeKey);
             // if the node is not found, return null
