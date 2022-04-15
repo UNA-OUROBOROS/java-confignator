@@ -24,7 +24,7 @@ public class Configuration {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T get(String key, Class<T> clazz) {
+    public <T> T get(String key) {
         return (T) getNode(key).getValue();
     }
 
@@ -59,8 +59,19 @@ public class Configuration {
         return true;
     }
 
+    /**
+     * tries to add a new value to the configuration, if it exists replace it.
+     * 
+     * @param key   the key of the value
+     * @param value the value
+     */
     public void addValue(String key, Object value) {
-        getNode(key).addNode(key, new Node("", value));
+        Node node = getNode(key);
+        if (node == null) {
+            root.addNode(key, new Node("", value));
+        } else {
+            node.setValue(value);
+        }
     }
 
     public boolean removeValue(String key) {
