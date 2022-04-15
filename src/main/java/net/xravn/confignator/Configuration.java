@@ -25,7 +25,11 @@ public class Configuration {
 
     @SuppressWarnings("unchecked")
     public <T> T get(String key) {
-        return (T) getNode(key).getValue();
+        Node node = getNode(key);
+        if (node == null) {
+            return null;
+        }
+        return (T) node.getValue();
     }
 
     public void set(String key, Object value) throws NodeNotFoundException {
@@ -136,9 +140,17 @@ public class Configuration {
 
         public Node getNode(String key) {
             String nodeKey = key;
-            // get the first substring before the first dot
+            // search recursively
             if (key.contains(".")) {
+                // strip the first part of the key
                 nodeKey = key.substring(0, key.indexOf("."));
+                String childKey = key.substring(key.indexOf(".") + 1);
+                // search for the child
+                Node child = children.get(nodeKey);
+                if (child == null) {
+                    return null;
+                }
+                return child.getNode(childKey);
             }
             // search for the node
             Node node = children.get(nodeKey);
@@ -160,9 +172,11 @@ public class Configuration {
             if (path.indexOf(".") == -1) {
                 // if not, add the node to the children if it does not exist
                 if (!children.containsKey(path)) {
-                    children.put(path, node);
                     // rename the node key
                     node.setKey(path);
+                    // add it to the list
+                    children.put(path, node);
+
                 } else {
                     throw new IllegalArgumentException("Node already exists");
                 }
@@ -179,6 +193,8 @@ public class Configuration {
                     parentNode = new Node(nodeKey);
                     // add the node to the children recursively
                     parentNode.addNode(newPath, node);
+                    // add the node to itself
+                    children.put(nodeKey, parentNode);
                 } else {
                     // if the node is found add recursively
                     parentNode.addNode(path.substring(path.indexOf(".") + 1), node);
@@ -210,6 +226,10 @@ public class Configuration {
             }
         }
 
+        @Override
+        public String toString() {
+            return key + ": " + value;
+        }
     }
 
 }

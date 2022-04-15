@@ -1,6 +1,7 @@
 package net.xravn.confignator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.security.Key;
@@ -27,6 +28,11 @@ public class ConfigurationTest {
 
     @Test
     void testCreateNewChildNode() {
+        Configuration configuration = new Configuration("default");
+        configuration.addValue("key.child", 3);
+        int value = configuration.get("key.child");
+        assertNull(configuration.get("key"));
+        assertEquals(value, 3);
     }
 
 }
